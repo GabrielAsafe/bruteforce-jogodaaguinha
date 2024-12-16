@@ -9,7 +9,7 @@ public class Main {
         LinkedList<Caixa>listaDepreenchidos = new LinkedList<>();
         LinkedList<Caixa> listaDeCaixas = new LinkedList<>();
         LinkedList<String> lista = new LinkedList<>();
-        preencher(listaDeCaixas,lista,2);//altere aqui a quantidade de caixas -> paralelo ao nível de dificuldade
+        preencher(listaDeCaixas,lista,9);//altere aqui a quantidade de caixas -> paralelo ao nível de dificuldade
 
 
         listaDeCaixas.iterator().forEachRemaining(caixa -> System.out.println(caixa.toString()));
@@ -25,7 +25,7 @@ public class Main {
 
                 Caixa.moverObjeto(caixa1,caixa2);
                 listaDeCaixas.iterator().forEachRemaining(caixa -> System.out.println(caixa.toString()));
-                if(isListaDeCaixasSorted(listaDeCaixas))
+                if(verifyIsComplete(listaDeCaixas,listaDepreenchidos))
                     break;
 
             } catch (Exception e) {
@@ -35,48 +35,57 @@ public class Main {
 
         }
     }
-    public static boolean isListaDeCaixasSorted(LinkedList<Caixa> listaDeCaixas) {
-        // First, check if each Caixa is internally sorted
-        for (Caixa caixa : listaDeCaixas) {
-            // Ensure each Caixa has exactly 4 items
-            if (caixa.getItems().size() != 4) {
-                return false;  // If any Caixa has fewer or more than 4 items, it's not valid
+
+    /**
+     * Verifica em todas as caixas se elas estão sorted
+     * @param listaDeCaixas
+     * @param listaDepreenchidos
+     * @return
+     */
+    public static boolean verifyIsComplete( LinkedList<Caixa> listaDeCaixas, LinkedList<Caixa>listaDepreenchidos){
+        boolean sorted = false;
+        boolean controle = false;
+        int emptycount = 0;
+        for (int j = 0; j < listaDeCaixas.size(); j++) {
+
+            LinkedList tmp = new LinkedList(listaDeCaixas.get(j).getItems()); // Faz uma cópia da lista original
+            if(tmp.isEmpty())
+                emptycount++;
+
+
+            if(tmp.size() != 4)
+                continue;
+
+
+
+            for (int i = 0; i < listaDeCaixas.size(); i++) {if(listaDeCaixas.get(i).QTDPreenchimento != 4){controle = false;} }
+
+
+            if(tmp.get(0) ==tmp.get(1) && tmp.get(2)==tmp.get(3) && tmp.get(2)==tmp.get(0))
+                sorted = true;
+
+
+            if (controle && emptycount ==2)
+            {
+                sorted = true;
+
             }
-            // Check if the items inside each Caixa are sorted
-            if (!isCaixaSorted(caixa)) {
-                return false;  // If any Caixa's items are not sorted, return false
-            }
+
         }
+        for (int i = 0; i < listaDeCaixas.size(); i++) {
+            LinkedList tmp = new LinkedList(listaDeCaixas.get(i).getItems());
 
-        // Now, check if the list of Caixa is sorted based on the first item of each Caixa
-        for (int i = 0; i < listaDeCaixas.size() - 1; i++) {
-            Caixa current = listaDeCaixas.get(i);
-            Caixa next = listaDeCaixas.get(i + 1);
-
-            // Compare the first item of the current and next Caixa lexicographically
-            if (current.getItems().get(0).compareTo(next.getItems().get(0)) > 0) {
-                return false;  // If current first item is greater, the list is not sorted
+            if(tmp.isEmpty() || tmp.size() <4){
+                sorted = false;
+                continue;
             }
-        }
+            if(tmp.get(0) ==tmp.get(1) && tmp.get(2)==tmp.get(3) && tmp.get(2)==tmp.get(0)){
+                sorted = true;
+            }
 
-        return true;  // Return true if all checks pass
+        }
+        return sorted;
     }
-
-    private static boolean isCaixaSorted(Caixa caixa) {
-        List<String> items = caixa.getItems();
-
-        // Check if the items inside the Caixa are sorted in lexicographical order
-        for (int i = 0; i < items.size() - 1; i++) {
-            if (items.get(i).compareTo(items.get(i + 1)) > 0) {
-                return false;  // If any item is greater than the next, it's not sorted
-            }
-        }
-        return true;  // All items are sorted
-    }
-
-
-
-
     public static int createRandom(int min, int max){
 
         return ThreadLocalRandom.current().nextInt(min, max + 1);
